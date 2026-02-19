@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Grafos Pro</title>
+    <link rel="stylesheet" href="grafo.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="panel-control">
+  <h3>Nodos</h3>
+<div class="toolbar">
+    <button id="btn-dibujar" class="btn-tool">Crear y juntar nodos</button>
+    <button id="btn-mover" class="btn-tool">Mover nodos</button>
+    <button id="btn-eliminar" class="btn-tool">Eliminar nodo</button>
+</div>
+    </div>
+
+    <svg id="lienzo">
+        <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7"
+            refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#555" />
+            </marker>
+        </defs>
+        
+        <g id="capa-aristas"></g>
+        <line id="linea-temporal" x1="0" y1="0" x2="0" y2="0" stroke="#999" stroke-width="2" stroke-dasharray="5,5" display="none" />
+        <g id="capa-vertices"></g>
+    </svg>
+
+    <script src="grafo.js"></script>
+</body>
+</html>
