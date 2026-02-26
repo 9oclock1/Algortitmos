@@ -3,46 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdiosMundol</title>
-    <link rel="stylesheet" href="algoritmos.css">
+    <title>Editor de Grafos Pro</title>
+    <link rel="stylesheet" href="grafo.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <main>
-        <section id="seccion1" class="card">
-            <div class="content">
-                <h2>1. El Comienzo</h2>
-                <p>El análisis de algoritmos es la disciplina fundamental de la computación que mide la eficiencia de un código para resolver un problema,
-                 centrándose en el uso óptimo de recursos como el tiempo de ejecución (complejidad temporal)
-                 y el espacio en memoria (complejidad espacial).</p>
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRE0pqrljiYEANRSkUjpi6b-kRYiOrNBVP07w&s" alt="Imagen 1" class="fade-in">
-            </div>
-        </section>
 
-        <section id="seccion2" class="card">
-            <div class="content">
-                <h2>2. Notacion big O</h2>
-                <p>Su importancia radica en la capacidad de garantizar
-                    la escalabilidad y el rendimiento en sistemas reales;
-                    mientras que un algoritmo ineficiente puede colapsar
-                    al manejar grandes volúmenes de datos, uno bien analizado permite
-                     optimizar procesos críticos como búsquedas, ordenamientos y procesamiento
-                     de información compleja.</p>
-                <img src="https://i.ytimg.com/vi/g1nAxNKcP0M/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBEOiBw41mBaCqIyxrcmyXFHyF7zA" alt="Imagen 2" class="fade-in">
-            </div>
-        </section>
+    <div class="panel-control">
+        <h3>Herramientas</h3>
+        <div class="toolbar">
+            <button id="btn-dibujar" class="btn-tool active">Crear y juntar</button>
+            <button id="btn-mover" class="btn-tool">Mover nodos</button>
+            <button id="btn-eliminar" class="btn-tool">Eliminar</button>
+        </div>
 
-        <section id="seccion3" class="card">
-            <div>
-                <h2 id="miGrafo" class="post-link">3. Nodos</h2>
-                <p>Es la unidad mínima de información en estructuras de datos.
-                     Funciona como un bloque o "celda" que permite almacenar
-                     un valor y conectarlo con otros elementos dentro de un sistema.</p>
-                <img src="https://www.mclibre.org/consultar/xml/img/grafos/grafos-grafo.svg" alt="Imagen 3" class="fade-in">
-         </div>
-        </section>
+        <h3>Lista de Nodos</h3>
+        <ul id="lista-nodos"></ul>
 
-    </main>
+        <h3>Matriz de Adyacencia</h3>
+        <div id="contenedor-matriz">
+            <p class="empty-msg">Matriz vacía</p>
+        </div>
+    </div>
 
-    <script src="algoritmos.js"></script>
+    <svg id="lienzo">
+        <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#555" />
+            </marker>
+        </defs>
+        
+        <g id="capa-aristas"></g>
+        <line id="linea-temporal" x1="0" y1="0" x2="0" y2="0" stroke="#999" stroke-width="2" stroke-dasharray="5,5" display="none" />
+        <g id="capa-vertices"></g>
+    </svg>
+
+    <script src="grafo.js"></script>
 </body>
 </html>

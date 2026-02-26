@@ -10,18 +10,25 @@
 <body>
 
     <div class="panel-control">
-  <h3>Nodos</h3>
-<div class="toolbar">
-    <button id="btn-dibujar" class="btn-tool">Crear y juntar nodos</button>
-    <button id="btn-mover" class="btn-tool">Mover nodos</button>
-    <button id="btn-eliminar" class="btn-tool">Eliminar nodo</button>
-</div>
+        <h3>Herramientas</h3>
+        <div class="toolbar">
+            <button id="btn-dibujar" class="btn-tool active">Crear y juntar</button>
+            <button id="btn-mover" class="btn-tool">Mover nodos</button>
+            <button id="btn-eliminar" class="btn-tool">Eliminar</button>
+        </div>
+
+        <h3>Lista de Nodos</h3>
+        <ul id="lista-nodos"></ul>
+
+        <h3>Matriz de Adyacencia</h3>
+        <div id="contenedor-matriz">
+            <p class="empty-msg">Matriz vacía</p>
+        </div>
     </div>
 
     <svg id="lienzo">
         <defs>
-            <marker id="arrowhead" markerWidth="10" markerHeight="7"
-            refX="9" refY="3.5" orient="auto">
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
                 <polygon points="0 0, 10 3.5, 0 7" fill="#555" />
             </marker>
         </defs>

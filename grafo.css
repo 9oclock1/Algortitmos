@@ -10,11 +10,13 @@ body {
     position: fixed;
     top: 20px;
     left: 20px;
-    width: 250px;
-    background: rgba(0, 0, 0, 0.95);
+    width: 300px; /* Un poco más ancho para que quepa la matriz */
+    max-height: 90vh;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.95); /* Cambiado a claro para que se lea mejor */
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(255, 10, 10, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     backdrop-filter: blur(5px);
     display: flex;
@@ -22,24 +24,20 @@ body {
     gap: 15px;
 }
 
-h2 {
-    margin: 0; font-size: 18px; color: #2c3e50; }
-h3 {
-    margin: 0; font-size: 14px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px;}
+h2 { margin: 0; font-size: 18px; color: #2c3e50; }
+h3 { margin: 0; font-size: 14px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px;}
+
+ul#lista-nodos {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    font-size: 13px;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
 .empty-msg { color: #aaa; font-style: italic; text-align: center; }
-#btn-eliminar {
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-}
-.btn-normal {
-    background-color: #3498db;
-    color: white;
-}
-.btn-normal:hover { background-color: #132740; }
+
 #lienzo { width: 100vw; height: 100vh; cursor: crosshair; }
 
 .vertice circle {
@@ -67,12 +65,20 @@ h3 {
     cursor: pointer;
     transition: stroke 0.2s;
 }
-.arista:hover { stroke: #000000; stroke-width: 3px; }
-.toolbar {
-    display: flex;
-    gap: 5px;
-    margin-top: 5px;
+.arista:hover { stroke: #e74c3c; stroke-width: 3px; }
+
+/* Estilos para el texto del peso */
+.peso-texto {
+    font-size: 14px;
+    font-weight: bold;
+    fill: #e74c3c;
+    pointer-events: none;
+    user-select: none;
+    text-anchor: middle;
+    background: white;
 }
+
+.toolbar { display: flex; gap: 5px; margin-top: 5px; }
 
 .btn-tool {
     flex: 1;
@@ -90,4 +96,20 @@ h3 {
     background: #243946;
     color: white;
     border-color: #000000;
+}
+
+/* Estilos para la Matriz */
+.matriz-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    text-align: center;
+}
+.matriz-tabla th, .matriz-tabla td {
+    border: 1px solid #ccc;
+    padding: 4px;
+}
+.matriz-tabla th {
+    background-color: #ecf0f1;
+    color: #2c3e50;
 }

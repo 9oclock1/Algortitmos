@@ -3,6 +3,7 @@ const capaVertices = document.getElementById('capa-vertices');
 const capaAristas = document.getElementById('capa-aristas');
 const lineaTemporal = document.getElementById('linea-temporal');
 const listaNodosUI = document.getElementById('lista-nodos');
+const contenedorMatriz = document.getElementById('contenedor-matriz');
 
 const btnDibujar = document.getElementById('btn-dibujar');
 const btnMover = document.getElementById('btn-mover');
@@ -21,12 +22,10 @@ let offsetDrag = { x: 0, y: 0 };
 function cambiarModo(nuevoModo) {
     modoActual = nuevoModo;
     
-    // Resetear clases visuales
     if(btnDibujar) btnDibujar.classList.remove('active');
     if(btnMover) btnMover.classList.remove('active');
     if(btnEliminar) btnEliminar.classList.remove('active');
     
-    // Activar botón y cursor
     if (modoActual === 'dibujar') {
         if(btnDibujar) btnDibujar.classList.add('active');
         lienzo.style.cursor = "crosshair";
@@ -39,55 +38,43 @@ function cambiarModo(nuevoModo) {
     }
 }
 
-// Listeners seguros (solo si existen los botones)
 if(btnDibujar) btnDibujar.addEventListener('click', () => cambiarModo('dibujar'));
 if(btnMover) btnMover.addEventListener('click', () => cambiarModo('mover'));
 if(btnEliminar) btnEliminar.addEventListener('click', () => cambiarModo('eliminar'));
 
-
-// --- 2. CREAR NODOS ---
+// --- CREAR NODOS ---
 lienzo.addEventListener('click', (e) => {
-    // Depuración: Si esto no sale en la consola (F12), el JS no carga.
-    // console.log("Click en lienzo. Modo:", modoActual, "Target:", e.target.id);
-
     if (modoActual !== 'dibujar') return;
     if (dibujandoArista) return;
 
-    // Solo crear si se clickea el fondo SVG directamente
     if (e.target.id === 'lienzo') {
         crearVertice(e.clientX, e.clientY);
     }
 });
 
 function crearVertice(x, y) {
-    contadorVertices++;
-    const id = `v-${contadorVertices}`;
+    // Usamos un ID único basado en el tiempo para evitar conflictos internos
+    const idUnico = `v-${Date.now()}`;
     
-    // Guardar lógica
-    listaVertices.push({ id: id, numero: contadorVertices });
-    actualizarListaUI();
-
-    // Crear Grupo SVG
+    listaVertices.push({ id: idUnico, numero: 0 }); // El número se asignará al reenumerar
+    
     const grupo = document.createElementNS("http://www.w3.org/2000/svg", "g");
     grupo.setAttribute('class', 'vertice');
     grupo.setAttribute('transform', `translate(${x}, ${y})`);
-    grupo.setAttribute('id', id);
-    
-    // Guardar coordenadas para movimiento
+    grupo.setAttribute('id', idUnico);
     grupo.dataset.cx = x;
     grupo.dataset.cy = y;
 
-    // EVENTOS DEL NODO
     grupo.addEventListener('click', (e) => {
         if (modoActual === 'eliminar') {
             e.stopPropagation();
-            eliminarVertice(id);
+            eliminarVertice(idUnico);
         }
     });
 
     grupo.addEventListener('mousedown', (e) => {
         if (modoActual === 'dibujar') {
-            iniciarArista(e, id);
+            iniciarArista(e, idUnico);
         } else if (modoActual === 'mover') {
             iniciarArrastre(e, grupo);
         }
@@ -95,25 +82,41 @@ function crearVertice(x, y) {
 
     grupo.addEventListener('mouseup', (e) => {
         if (modoActual === 'dibujar') {
-            finalizarArista(e, id);
+            finalizarArista(e, idUnico);
         }
     });
 
-    // Dibujar elementos visuales
     const circulo = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     circulo.setAttribute('r', RADIO_NODO);
 
     const texto = document.createElementNS("http://www.w3.org/2000/svg", "text");
     texto.setAttribute('dy', 5);
     texto.setAttribute('text-anchor', 'middle');
-    texto.textContent = contadorVertices;
+    // El texto se pondrá en reenumerarNodos
 
     grupo.appendChild(circulo);
     grupo.appendChild(texto);
     capaVertices.appendChild(grupo);
+
+    reenumerarNodos(); // Re-calcula los números de los nodos
 }
 
-// --- 3. MOVER NODOS Y ARISTAS ---
+// --- REENUMERAR NODOS Y ACTUALIZAR UI ---
+function reenumerarNodos() {
+    listaVertices.forEach((nodo, index) => {
+        nodo.numero = index + 1; // Asigna un número secuencial limpio
+        const grupo = document.getElementById(nodo.id);
+        if(grupo) {
+            const textoElement = grupo.querySelector('text');
+            if(textoElement) textoElement.textContent = nodo.numero;
+        }
+    });
+    
+    actualizarListaUI();
+    actualizarMatriz();
+}
+
+// --- MOVER NODOS Y ARISTAS ---
 function iniciarArrastre(e, grupo) {
     e.stopPropagation();
     nodoArrastrado = grupo;
@@ -125,12 +128,10 @@ function iniciarArrastre(e, grupo) {
 }
 
 window.addEventListener('mousemove', (e) => {
-    // Caso 1: Dibujando línea temporal
     if (dibujandoArista) {
         actualizarLineaTemporal(verticeOrigen.x, verticeOrigen.y, e.clientX, e.clientY);
     }
     
-    // Caso 2: Moviendo nodo
     if (nodoArrastrado && modoActual === 'mover') {
         e.preventDefault(); 
         const nuevoX = e.clientX - offsetDrag.x;
@@ -150,7 +151,7 @@ window.addEventListener('mouseup', () => {
     }
 });
 
-// --- 4. ARISTAS ---
+// --- ARISTAS ---
 function iniciarArista(e, id) {
     e.stopPropagation();
     const nodo = document.getElementById(id);
@@ -166,7 +167,7 @@ function iniciarArista(e, id) {
 
 function finalizarArista(e, idDestino) {
     e.stopPropagation();
-    if (!dibujandoArista || !verticeOrigen) return; // Validación extra
+    if (!dibujandoArista || !verticeOrigen) return;
     if (modoActual !== 'dibujar') return;
 
     if (verticeOrigen.id !== idDestino) {
@@ -174,31 +175,55 @@ function finalizarArista(e, idDestino) {
         const xDest = parseFloat(nodoDest.dataset.cx);
         const yDest = parseFloat(nodoDest.dataset.cy);
         
-        crearAristaVisual(verticeOrigen.x, verticeOrigen.y, xDest, yDest, verticeOrigen.id, idDestino);
+        // Pedir el peso
+        let pesoIngresado = prompt("Ingrese el peso de la arista:", "1");
+        if (pesoIngresado === null || pesoIngresado.trim() === "" || isNaN(pesoIngresado)) {
+            resetearEstado();
+            return; // Si cancela o pone algo inválido, no se crea la arista
+        }
+
+        crearAristaVisual(verticeOrigen.x, verticeOrigen.y, xDest, yDest, verticeOrigen.id, idDestino, parseFloat(pesoIngresado));
     }
     resetearEstado();
 }
 
-function crearAristaVisual(cx1, cy1, cx2, cy2, idOrigen, idDestino) {
+function crearAristaVisual(cx1, cy1, cx2, cy2, idOrigen, idDestino, peso) {
     const coords = obtenerPuntosBorde(cx1, cy1, cx2, cy2);
     if (!coords) return;
 
+    const idArista = `e-${Date.now()}`; // ID único para la línea
+
     const linea = document.createElementNS("http://www.w3.org/2000/svg", "line");
     linea.setAttribute('class', 'arista');
+    linea.setAttribute('id', idArista);
     linea.setAttribute('x1', coords.x1);
     linea.setAttribute('y1', coords.y1);
     linea.setAttribute('x2', coords.x2);
     linea.setAttribute('y2', coords.y2);
     linea.setAttribute('data-origen', idOrigen);
     linea.setAttribute('data-destino', idDestino);
+    linea.setAttribute('data-peso', peso);
+
+    // Texto del peso
+    const textoPeso = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    textoPeso.setAttribute('class', 'peso-texto');
+    textoPeso.setAttribute('id', `text-${idArista}`);
+    textoPeso.textContent = peso;
+    textoPeso.setAttribute('x', (coords.x1 + coords.x2) / 2);
+    textoPeso.setAttribute('y', ((coords.y1 + coords.y2) / 2) - 8);
 
     linea.addEventListener('click', (e) => {
         if (modoActual === 'eliminar') {
             e.stopPropagation();
-            e.target.remove();
+            textoPeso.remove(); // Borra el texto
+            e.target.remove();  // Borra la línea
+            actualizarMatriz(); // Actualiza matriz al borrar arco
         }
     });
+
     capaAristas.appendChild(linea);
+    capaAristas.appendChild(textoPeso);
+    actualizarMatriz(); // Actualiza matriz al crear arco
 }
 
 function actualizarAristasConectadas(idNodo, x, y) {
@@ -228,6 +253,13 @@ function actualizarAristasConectadas(idNodo, x, y) {
                 arista.setAttribute('y1', coords.y1);
                 arista.setAttribute('x2', coords.x2);
                 arista.setAttribute('y2', coords.y2);
+
+                // Actualizar la posición del texto del peso
+                const textoPeso = document.getElementById(`text-${arista.id}`);
+                if (textoPeso) {
+                    textoPeso.setAttribute('x', (coords.x1 + coords.x2) / 2);
+                    textoPeso.setAttribute('y', ((coords.y1 + coords.y2) / 2) - 8);
+                }
             }
         }
     });
@@ -261,17 +293,27 @@ function actualizarLineaTemporal(x1, y1, x2, y2) {
     lineaTemporal.setAttribute('y2', y2);
 }
 
+// --- ELIMINAR VÉRTICES Y ACTUALIZAR ---
 function eliminarVertice(idVertice) {
+    // 1. Eliminar aristas conectadas y sus textos
     const aristas = document.querySelectorAll('.arista');
     aristas.forEach(arista => {
         if (arista.dataset.origen === idVertice || arista.dataset.destino === idVertice) {
+            const textoPeso = document.getElementById(`text-${arista.id}`);
+            if (textoPeso) textoPeso.remove();
             arista.remove();
         }
     });
+
+    // 2. Eliminar el nodo físico
     const nodo = document.getElementById(idVertice);
     if (nodo) nodo.remove();
+
+    // 3. Eliminar de la lógica
     listaVertices = listaVertices.filter(v => v.id !== idVertice);
-    actualizarListaUI();
+    
+    // 4. Re-enumerar nodos (esto actualiza la UI y la matriz)
+    reenumerarNodos();
 }
 
 function actualizarListaUI() {
@@ -286,4 +328,54 @@ function actualizarListaUI() {
             listaNodosUI.appendChild(li);
         });
     }
+}
+
+// --- MATRIZ DE ADYACENCIA ---
+function actualizarMatriz() {
+    if (!contenedorMatriz) return;
+    const n = listaVertices.length;
+    
+    if (n === 0) {
+        contenedorMatriz.innerHTML = '<p class="empty-msg">Matriz vacía</p>';
+        return;
+    }
+
+    // Inicializar matriz NxN con ceros
+    let matriz = Array(n).fill(0).map(() => Array(n).fill(0));
+
+    // Llenar matriz con los pesos de las aristas
+    const aristas = document.querySelectorAll('.arista');
+    aristas.forEach(arista => {
+        const idOrigen = arista.dataset.origen;
+        const idDestino = arista.dataset.destino;
+        const peso = parseFloat(arista.dataset.peso) || 0;
+
+        const indexOrigen = listaVertices.findIndex(v => v.id === idOrigen);
+        const indexDestino = listaVertices.findIndex(v => v.id === idDestino);
+
+        if (indexOrigen !== -1 && indexDestino !== -1) {
+            // Asumimos grafo dirigido por la flecha del CSS
+            matriz[indexOrigen][indexDestino] = peso;
+        }
+    });
+
+    // Construir la tabla HTML
+    let html = '<table class="matriz-tabla"><thead><tr><th></th>';
+    // Encabezados de columnas
+    for(let i = 0; i < n; i++) {
+        html += `<th>V${listaVertices[i].numero}</th>`;
+    }
+    html += '</tr></thead><tbody>';
+
+    // Filas de la matriz
+    for(let i = 0; i < n; i++) {
+        html += `<tr><th>V${listaVertices[i].numero}</th>`;
+        for(let j = 0; j < n; j++) {
+            html += `<td>${matriz[i][j]}</td>`;
+        }
+        html += '</tr>';
+    }
+    
+    html += '</tbody></table>';
+    contenedorMatriz.innerHTML = html;
 }
