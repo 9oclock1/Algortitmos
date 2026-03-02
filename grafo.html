@@ -5,16 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editor de Grafos Pro</title>
     <link rel="stylesheet" href="grafo.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="panel-control">
         <h3>Herramientas</h3>
         <div class="toolbar">
-            <button id="btn-dibujar" class="btn-tool active">Crear y juntar</button>
-            <button id="btn-mover" class="btn-tool">Mover nodos</button>
-            <button id="btn-eliminar" class="btn-tool">Eliminar</button>
+            <button id="btn-dibujar" class="btn-tool active">Dibujar</button>
+            <button id="btn-mover" class="btn-tool">Mover</button>
+            <button id="btn-eliminar" class="btn-tool">Borrar</button>
+        </div>
+
+        <div class="guia-rapida">
+            <h4>¿Cómo funciona?</h4>
+            <ul>
+                <li><strong>Dibujar:</strong> Clic en el fondo crea un nodo. Clic de un nodo a otro los conecta.</li>
+                <li><strong>Mover:</strong> Clic sostenido sobre un nodo para arrastrarlo.</li>
+                <li><strong>Borrar:</strong> Clic sobre un nodo o flecha para eliminarlo.</li>
+            </ul>
+        </div>
+
+        <div class="json-tools">
+            <button id="btn-exportar" class="btn-json">Guardar JSON</button>
+            <button id="btn-importar" class="btn-json btn-outline">Cargar JSON</button>
+            <input type="file" id="file-importar" accept=".json" style="display: none;">
         </div>
 
         <h3>Lista de Nodos</h3>
@@ -28,13 +42,13 @@
 
     <svg id="lienzo">
         <defs>
-            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                <polygon points="0 0, 10 3.5, 0 7" fill="#555" />
+            <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                <polygon points="0 0, 8 3, 0 6" fill="#C4BCAF" />
             </marker>
         </defs>
         
         <g id="capa-aristas"></g>
-        <line id="linea-temporal" x1="0" y1="0" x2="0" y2="0" stroke="#999" stroke-width="2" stroke-dasharray="5,5" display="none" />
+        <line id="linea-temporal" x1="0" y1="0" x2="0" y2="0" stroke="#D6D0C4" stroke-width="2" stroke-dasharray="6,6" display="none" />
         <g id="capa-vertices"></g>
     </svg>
 

@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // 1. Lógica para mostrar las tarjetas con efecto suave al hacer scroll
     const cards = document.querySelectorAll('.card');
     const observerOptions = {
         threshold: 0.2
@@ -7,18 +8,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
+                entry.target.classList.add('visible'); // Activa el CSS de opacidad
                 observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
+
     cards.forEach(card => {
         observer.observe(card);
     });
-});
-const imagen = document.getElementById('miGrafo');
-        imagen.addEventListener('click', function() {
+
+    // 2. Lógica del clic en el título de "Nodos"
+    const tituloGrafo = document.getElementById('miGrafo');
+    
+    if (tituloGrafo) {
+        tituloGrafo.addEventListener('click', function() {
             const pagAlgor = 'grafo.html';
             window.open(pagAlgor, '_blank');
         });
-    
+    }
+});

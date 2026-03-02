@@ -6,45 +6,50 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1;
-    background-color: #f4f4f9;
-    color: #333;
+    line-height: 1.7; /* Más interlineado para lectura fácil */
+    background-color: #F4F1EA; /* Fondo crema cálido */
+    color: #5D564D; /* Gris/Marrón cálido, no negro puro */
 }
 
 main {
-    margin-top: 10px;
+    margin-top: 40px;
     padding: 20px;
-    max-width: 800px;
+    max-width: 750px; 
     margin-left: auto;
     margin-right: auto;
 }
 
 .card {
-    background: white;
+    background: #FCFBF7; /* Blanco hueso */
     margin-bottom: 40px;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 45px;
+    border-radius: 16px; 
+    box-shadow: 0 8px 30px rgba(74, 68, 59, 0.04); /* Sombra elegante */
+    border: 1px solid #EAE6DF;
+    
+    /* Efecto de aparición al hacer scroll */
     opacity: 0; 
-    transform: translateY(20px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transform: translateY(25px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
-
+/* Esta clase la agrega el Javascript automáticamente */
 .card.visible {
     opacity: 1;
     transform: translateY(0);
 }
 
 .content h2 {
-    color: #2c3e50;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #3498db;
+    color: #38332C; /* Marrón muy oscuro */
+    margin-bottom: 20px;
+    border-bottom: 1px solid #D6D0C4; /* Línea separadora sutil */
+    padding-bottom: 10px;
     display: inline-block;
+    font-weight: 600;
 }
 
 .content p {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     font-size: 1.1em;
 }
 
@@ -52,6 +57,56 @@ main {
     width: 100%;
     height: auto;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(74, 68, 59, 0.05);
+    transition: transform 0.4s ease;
 }
 
+.content img:hover {
+    transform: scale(1.02); /* Zoom súper ligero en la imagen */
+}
+
+/* --- TÍTULO INTERACTIVO "NODOS" --- */
+.contenedor-titulo-clic {
+    position: relative;
+    display: inline-block; /* Para que la etiqueta se pegue al lado */
+}
+
+#miGrafo {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 2px dashed #B5A898; 
+    color: #4A443B;
+    margin-bottom: 0; /* Ajuste para el contenedor */
+}
+
+#miGrafo:hover {
+    color: #8A7B66; /* Tono arcilla/tierra */
+    border-bottom: 2px solid #8A7B66; 
+}
+
+/* --- ETIQUETA DE AYUDA ELEGANTE --- */
+.etiqueta-ayuda {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translate(15px, -50%);
+    background-color: #F0EBE1; /* Crema oscurito */
+    color: #5D564D;
+    border: 1px solid #D6D0C4;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    pointer-events: none;
+    white-space: nowrap;
+    
+    /* Animación: Aparece después que la tarjeta */
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    transition-delay: 0.6s; 
+}
+
+/* Aparece cuando la sección 3 se vuelve visible */
+.card.visible .etiqueta-ayuda {
+    opacity: 1;
+}

@@ -1,33 +1,89 @@
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f2f5;
-            margin: 0;
-        }
-        .tarjeta {
-            background-color: white;
-            border-radius: 24px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            padding: 60px;
-            text-align: center;
-            width: 333px;
-        }
-        .imagen-clickeable {
-            width: 100%;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .imagen-clickeable:hover {
-            transform: scale(1.03);
-        }
-        .texto-descripcion {
-            margin-top: 40px;
-            color: #333;
-            font-size: 16px;
-            font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-        }
-    
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #F4F1EA; /* Fondo crema cálido, no cansa la vista */
+    margin: 0;
+}
+
+.tarjeta {
+    background-color: #FCFBF7; /* Blanco hueso */
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(74, 68, 59, 0.08); /* Sombra suave y cálida */
+    border: 1px solid #EAE6DF;
+    padding: 130px; 
+    width: 90%;
+    max-width: 350px; /* Límite estricto para que la tarjeta no crezca de más */
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.tarjeta:hover {
+    transform: translateY(-5px); 
+}
+
+.texto-descripcion {
+    margin: 0 0 30px 0; 
+    color: #4A443B; /* Marrón café oscuro, súper legible */
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.contenedor-imagen {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.imagen-clickeable {
+    width: 80%; 
+    max-width: 250px; /* ESTO ARREGLA EL PROBLEMA DEL LOGO GIGANTE */
+    height: auto;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.contenedor-imagen:hover .imagen-clickeable {
+    transform: scale(1.05);
+    filter: drop-shadow(0 8px 15px rgba(74, 68, 59, 0.15));
+}
+
+/* La etiqueta flotante en tono arcilla/tierra */
+.etiqueta-ayuda {
+    position: absolute;
+    bottom: -45px; 
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #8A7B66; /* Marrón tierra elegante */
+    color: #FCFBF7; /* Letras claras */
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(138, 123, 102, 0.3);
+    pointer-events: none; /* Deja que el clic pase al logo */
+    white-space: nowrap; 
+    animation: flotar 3s ease-in-out infinite;
+}
+
+
+
+/* Animaciones */
+@keyframes flotar {
+    0% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, -5px); } 
+    100% { transform: translate(-50%, 0); }
+}
+
