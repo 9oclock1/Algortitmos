@@ -18,6 +18,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let dibujandoArista = false;
     let nodoArrastrado = null;
     let offsetDrag = { x: 0, y: 0 };
+    
+    // --- NUEVO: Variables para el modal ---
+    let aristaPendiente = null; 
+    const modalPeso = document.getElementById('modal-peso');
+    const inputPeso = document.getElementById('input-peso');
+    const btnConfirmarPeso = document.getElementById('btn-confirmar-peso');
+    const btnCancelarPeso = document.getElementById('btn-cancelar-peso');
+    const errorPeso = document.getElementById('modal-error');
 
     function cambiarModo(nuevoModo) {
         modoActual = nuevoModo;
@@ -132,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // --- ARISTAS ---
+    // --- ARISTAS Y MODAL ---
     function iniciarArista(e, id) {
         e.stopPropagation();
         const nodo = document.getElementById(id);
@@ -155,26 +163,56 @@ document.addEventListener("DOMContentLoaded", () => {
             resetearEstado(); return;
         }
 
-        let pesoValido = false;
-        let pesoFinal = 0;
+        // En lugar de usar prompt, preparamos y mostramos el modal
+        aristaPendiente = { origen: verticeOrigen.id, destino: idDestino };
+        
+        inputPeso.value = "1";
+        errorPeso.style.display = 'none';
+        modalPeso.style.display = 'flex';
+        
+        // Timeout ligero para asegurar que el modal renderice antes del focus
+        setTimeout(() => inputPeso.focus(), 50);
 
-        while (!pesoValido) {
-            let p = prompt("Ingrese el peso de la arista (Solo números positivos):", "1");
-            if (p === null) { resetearEstado(); return; } 
-            
-            p = p.trim();
-            if (p === "") { alert("⚠️ El peso no puede estar vacío."); continue; }
-            
-            pesoFinal = parseFloat(p);
-            if (isNaN(pesoFinal) || pesoFinal <= 0) {
-                alert("❌ Número inválido. Ingresa un valor mayor a cero.");
-            } else {
-                pesoValido = true;
-            }
+        dibujandoArista = false;
+        lineaTemporal.style.display = 'none';
+    }
+
+    // Funciones del modal
+    function procesarModalPeso() {
+        if (!aristaPendiente) return;
+        
+        let p = inputPeso.value.trim();
+        if (p === "") {
+            errorPeso.textContent = "El peso no puede estar vacío.";
+            errorPeso.style.display = 'block';
+            return;
+        }
+        
+        let pesoFinal = parseFloat(p);
+        if (isNaN(pesoFinal) || pesoFinal <= 0) {
+            errorPeso.textContent = "Ingresa un número mayor a cero.";
+            errorPeso.style.display = 'block';
+            return;
         }
 
-        crearAristaVisual(verticeOrigen.id, idDestino, pesoFinal);
-        resetearEstado();
+        crearAristaVisual(aristaPendiente.origen, aristaPendiente.destino, pesoFinal);
+        cerrarModalPeso();
+    }
+
+    function cerrarModalPeso() {
+        modalPeso.style.display = 'none';
+        aristaPendiente = null;
+        verticeOrigen = null;
+    }
+
+    if (btnConfirmarPeso) btnConfirmarPeso.addEventListener('click', procesarModalPeso);
+    if (btnCancelarPeso) btnCancelarPeso.addEventListener('click', cerrarModalPeso);
+    
+    // Permitir enviar con la tecla Enter
+    if (inputPeso) {
+        inputPeso.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') procesarModalPeso();
+        });
     }
 
     function calcularRutaArista(idOrigen, idDestino) {

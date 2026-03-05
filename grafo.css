@@ -128,3 +128,72 @@ ul#lista-nodos { list-style: none; padding: 0; margin: 0; font-size: 13px; max-h
 .matriz-tabla th { background-color: #F0EBE1; font-weight: 600; }
 .matriz-tabla .col-suma, .matriz-tabla .fila-suma { background-color: #EBE5D9; font-weight: 600; }
 .matriz-tabla .col-cont, .matriz-tabla .fila-cont { background-color: #FCFBF7; font-weight: 600; color: #736758;}
+
+/* --- Modal Personalizado --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh;
+    background: rgba(74, 68, 59, 0.5); /* Oscurece el fondo con un tono tierra */
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background: #FCFBF7; /* Blanco hueso */
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(74, 68, 59, 0.2);
+    border: 1px solid #EAE6DF;
+    width: 280px;
+    text-align: center;
+    animation: aparecer 0.3s ease-out;
+}
+
+.modal-content h4 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    color: #4A443B;
+}
+
+.modal-content input {
+    width: 80%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #C4BCAF;
+    border-radius: 8px;
+    background: #F4F1EA;
+    color: #4A443B;
+    font-size: 16px;
+    text-align: center;
+    outline: none;
+    font-family: inherit;
+    font-weight: 600;
+    transition: border-color 0.2s;
+}
+
+.modal-content input:focus {
+    border-color: #8A7B66; /* Arcilla al enfocar */
+}
+
+.modal-error {
+    color: #e74c3c;
+    font-size: 12px;
+    font-weight: 600;
+    margin: -10px 0 10px 0;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+@keyframes aparecer {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}

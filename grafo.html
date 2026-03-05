@@ -52,6 +52,18 @@
         <g id="capa-vertices"></g>
     </svg>
 
+    <div id="modal-peso" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h4>Peso de la conexión</h4>
+            <p id="modal-error" class="modal-error" style="display: none;">Mensaje de error</p>
+            <input type="number" id="input-peso" value="1" min="0.1" step="any" placeholder="Ej: 5">
+            <div class="modal-buttons">
+                <button id="btn-cancelar-peso" class="btn-tool">Cancelar</button>
+                <button id="btn-confirmar-peso" class="btn-tool active">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="grafo.js"></script>
 </body>
 </html>
