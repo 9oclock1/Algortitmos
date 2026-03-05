@@ -39,13 +39,13 @@ h4 { margin: 0 0 12px 0; font-size: 14px; color: #4A443B; font-weight: 600; }
 .guia-rapida ul { padding-left: 20px; margin: 0;}
 .guia-rapida li { margin-bottom: 6px; color: #5D564D; }
 
-/* Flex para que quepan los 4 botones */
+/* Flex para que quepan los botones */
 .toolbar { display: flex; gap: 5px; flex-wrap: wrap; }
 .json-tools { display: flex; gap: 8px; }
 
 .btn-tool, .btn-json {
     flex: 1;
-    min-width: 65px; /* Para que no se encojan de más */
+    min-width: 65px; 
     padding: 8px 5px;
     border: 1px solid #D6D0C4;
     background: #FCFBF7;
@@ -64,6 +64,20 @@ h4 { margin: 0 0 12px 0; font-size: 14px; color: #4A443B; font-weight: 600; }
     background: #8A7B66; 
     border-color: #8A7B66;
     color: #FCFBF7;
+}
+
+/* --- ESTILO: Botones de peligro (Rojizos) --- */
+.btn-danger {
+    border-color: #ECA5A5;
+    color: #D9534F;
+}
+#btn-limpiar.btn-danger {
+    margin-top: -10px; /* Solo empuja hacia arriba el botón del panel lateral */
+}
+.btn-danger:hover {
+    background: #FDF1F1 !important; 
+    color: #C9302C !important;
+    border-color: #C9302C !important;
 }
 
 /* --- UI de Nodos y Aristas --- */

@@ -6,11 +6,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const listaNodosUI = document.getElementById('lista-nodos');
     const contenedorMatriz = document.getElementById('contenedor-matriz');
 
-    // Botones
+    // --- Botones Principales ---
     const btnDibujar = document.getElementById('btn-dibujar');
     const btnMover = document.getElementById('btn-mover');
-    const btnEditar = document.getElementById('btn-editar'); // NUEVO BOTÓN
+    const btnEditar = document.getElementById('btn-editar'); 
     const btnEliminar = document.getElementById('btn-eliminar');
+    const btnLimpiar = document.getElementById('btn-limpiar');
+
+    // --- ESTOS BOTONES FALTABAN (JSON) ---
+    const btnExportar = document.getElementById('btn-exportar');
+    const btnImportar = document.getElementById('btn-importar');
+    const fileImportar = document.getElementById('file-importar');
 
     const RADIO_NODO = 22; 
     let listaVertices = []; 
@@ -21,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let nodoArrastrado = null;
     let offsetDrag = { x: 0, y: 0 };
     
-    // Variables para modales
+    // Variables modal Nodo
     let nodoPendiente = null;
     let nodoEditando = null; 
     const modalNodo = document.getElementById('modal-nodo');
@@ -31,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const errorNodo = document.getElementById('modal-error-nodo');
     const tituloModalNodo = document.querySelector('#modal-nodo h4');
 
+    // Variables modal Arista
     let aristaPendiente = null; 
     let aristaEditando = null; 
     const modalPeso = document.getElementById('modal-peso');
@@ -39,6 +46,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnCancelarPeso = document.getElementById('btn-cancelar-peso');
     const errorPeso = document.getElementById('modal-error');
     const tituloModalPeso = document.querySelector('#modal-peso h4');
+
+    // Variables modal Exportar
+    const modalExportar = document.getElementById('modal-exportar');
+    const inputExportar = document.getElementById('input-exportar');
+    const btnConfirmarExportar = document.getElementById('btn-confirmar-exportar');
+    const btnCancelarExportar = document.getElementById('btn-cancelar-exportar');
+    const errorExportar = document.getElementById('modal-error-exportar');
+
+    // Variables modal Limpiar
+    const modalLimpiar = document.getElementById('modal-limpiar');
+    const btnConfirmarLimpiar = document.getElementById('btn-confirmar-limpiar');
+    const btnCancelarLimpiar = document.getElementById('btn-cancelar-limpiar');
 
     // --- CAMBIO DE MODOS ---
     function cambiarModo(nuevoModo) {
@@ -57,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
             lienzo.style.cursor = "grab";
         } else if (modoActual === 'editar') {
             if (btnEditar) btnEditar.classList.add('active');
-            lienzo.style.cursor = "pointer"; // Indica que algo se puede tocar
+            lienzo.style.cursor = "pointer"; 
         } else if (modoActual === 'eliminar') {
             if (btnEliminar) btnEliminar.classList.add('active');
             lienzo.style.cursor = "not-allowed";
@@ -69,7 +88,32 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnEditar) btnEditar.addEventListener('click', () => cambiarModo('editar'));
     if (btnEliminar) btnEliminar.addEventListener('click', () => cambiarModo('eliminar'));
 
-    // --- LÓGICA DE DIBUJO ---
+    // --- LÓGICA: LIMPIAR TODO ---
+    if (btnLimpiar) {
+        btnLimpiar.addEventListener('click', () => {
+            if (listaVertices.length === 0) return;
+            modalLimpiar.style.display = 'flex';
+        });
+    }
+
+    if (btnConfirmarLimpiar) {
+        btnConfirmarLimpiar.addEventListener('click', () => {
+            capaVertices.innerHTML = '';
+            capaAristas.innerHTML = '';
+            listaVertices = [];
+            actualizarVistas();
+            resetearEstado();
+            modalLimpiar.style.display = 'none';
+        });
+    }
+
+    if (btnCancelarLimpiar) {
+        btnCancelarLimpiar.addEventListener('click', () => {
+            modalLimpiar.style.display = 'none';
+        });
+    }
+
+    // --- LÓGICA DE NODOS ---
     lienzo.addEventListener('click', (e) => {
         if (modoActual !== 'dibujar' || dibujandoArista) return;
         if (e.target.id === 'lienzo') {
@@ -83,7 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Abrir Modal Edición Nodo
     function abrirEdicionNodo(idNodo) {
         nodoEditando = idNodo;
         tituloModalNodo.textContent = "Editar Nombre";
@@ -131,7 +174,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function crearVertice(x, y, idForzado = null, nombreForzado = null) {
         const idUnico = idForzado || `v-${Date.now()}`;
-        if (!idForzado) listaVertices.push({ id: idUnico, nombre: nombreForzado });
+        
+        // Lo guardamos siempre en la lista lógica
+        listaVertices.push({ id: idUnico, nombre: nombreForzado });
         
         const grupo = document.createElementNS("http://www.w3.org/2000/svg", "g");
         grupo.setAttribute('class', 'vertice');
@@ -167,7 +212,6 @@ document.addEventListener("DOMContentLoaded", () => {
         texto.setAttribute('text-anchor', 'middle');
         texto.textContent = nombreForzado; 
 
-        // Doble clic también funciona como atajo para editar
         texto.addEventListener('dblclick', (e) => {
             e.stopPropagation(); 
             if (modoActual !== 'eliminar') abrirEdicionNodo(idUnico);
@@ -260,7 +304,6 @@ document.addEventListener("DOMContentLoaded", () => {
         lineaTemporal.style.display = 'none';
     }
 
-    // Abrir Modal Edición Arista
     function abrirEdicionArista(idArista, pesoActual) {
         aristaEditando = idArista;
         tituloModalPeso.textContent = "Editar Peso";
@@ -371,11 +414,7 @@ document.addEventListener("DOMContentLoaded", () => {
         arista.setAttribute('id', idArista);
         arista.setAttribute('d', ruta.d);
         arista.setAttribute('data-origen', idOrigen);
-        
-        // --- ¡EL BUG REPARADO ESTÁ AQUÍ! ---
         arista.setAttribute('data-destino', idDestino); 
-        // -----------------------------------
-
         arista.setAttribute('data-peso', peso);
 
         const textoPeso = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -385,7 +424,6 @@ document.addEventListener("DOMContentLoaded", () => {
         textoPeso.setAttribute('x', ruta.tx);
         textoPeso.setAttribute('y', ruta.ty);
 
-        // Click en la línea o el texto
         const clickHandler = (e) => {
             if (modoActual === 'eliminar') {
                 e.stopPropagation();
@@ -401,7 +439,6 @@ document.addEventListener("DOMContentLoaded", () => {
         arista.addEventListener('click', clickHandler);
         textoPeso.addEventListener('click', clickHandler);
 
-        // Atajo de doble clic
         textoPeso.addEventListener('dblclick', (e) => {
             e.stopPropagation();
             if (modoActual !== 'eliminar') abrirEdicionArista(idArista, arista.dataset.peso);
@@ -454,7 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
         actualizarVistas();
     }
 
-    // --- MATRIZ CON NOMBRES ---
+    // --- MATRIZ ---
     function actualizarMatriz() {
         if (!contenedorMatriz) return;
         const n = listaVertices.length;
@@ -503,46 +540,73 @@ document.addEventListener("DOMContentLoaded", () => {
         contenedorMatriz.innerHTML = html;
     }
 
-    // --- IMPORTAR / EXPORTAR JSON ---
-    const btnExportar = document.getElementById('btn-exportar');
-    const btnImportar = document.getElementById('btn-importar');
-    const fileImportar = document.getElementById('file-importar');
-
+    // --- IMPORTAR / EXPORTAR JSON COMPLETAMENTE FUNCIONAL ---
     if (btnExportar) {
         btnExportar.addEventListener('click', () => {
             if (listaVertices.length === 0) {
                 alert("No hay nada que guardar. ¡Dibuja algunos nodos primero!");
                 return;
             }
-
-            const aristasData = Array.from(document.querySelectorAll('.arista')).map(a => ({
-                origen: a.dataset.origen,
-                destino: a.dataset.destino,
-                peso: parseFloat(a.dataset.peso)
-            }));
-
-            const nodosData = listaVertices.map(v => {
-                const nodoSVG = document.getElementById(v.id);
-                return {
-                    id: v.id,
-                    nombre: v.nombre, 
-                    x: parseFloat(nodoSVG.dataset.cx),
-                    y: parseFloat(nodoSVG.dataset.cy)
-                };
-            });
-
-            const dataJSON = JSON.stringify({ nodos: nodosData, aristas: aristasData }, null, 2);
-            const blob = new Blob([dataJSON], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "mi_grafo.json";
-            a.click();
-            URL.revokeObjectURL(url);
+            inputExportar.value = "mi_grafo";
+            errorExportar.style.display = 'none';
+            modalExportar.style.display = 'flex';
+            setTimeout(() => {
+                inputExportar.focus();
+                inputExportar.select();
+            }, 50);
         });
     }
 
+    function procesarExportar() {
+        let nombreArchivo = inputExportar.value.trim();
+        if (nombreArchivo === "") {
+            errorExportar.textContent = "El nombre no puede estar vacío.";
+            errorExportar.style.display = 'block';
+            return;
+        }
+
+        if (!nombreArchivo.endsWith('.json')) {
+            nombreArchivo += '.json';
+        }
+
+        const aristasData = Array.from(document.querySelectorAll('.arista')).map(a => ({
+            origen: a.dataset.origen,
+            destino: a.dataset.destino,
+            peso: parseFloat(a.dataset.peso)
+        }));
+
+        const nodosData = listaVertices.map(v => {
+            const nodoSVG = document.getElementById(v.id);
+            return {
+                id: v.id,
+                nombre: v.nombre, 
+                x: parseFloat(nodoSVG.dataset.cx),
+                y: parseFloat(nodoSVG.dataset.cy)
+            };
+        });
+
+        const dataJSON = JSON.stringify({ nodos: nodosData, aristas: aristasData }, null, 2);
+        const blob = new Blob([dataJSON], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = nombreArchivo;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        cerrarModalExportar();
+    }
+
+    function cerrarModalExportar() {
+        modalExportar.style.display = 'none';
+    }
+
+    if (btnConfirmarExportar) btnConfirmarExportar.addEventListener('click', procesarExportar);
+    if (btnCancelarExportar) btnCancelarExportar.addEventListener('click', cerrarModalExportar);
+    if (inputExportar) inputExportar.addEventListener('keyup', (e) => { if (e.key === 'Enter') procesarExportar(); });
+
+    // --- IMPORTAR JSON ---
     if (btnImportar && fileImportar) {
         btnImportar.addEventListener('click', () => { fileImportar.click(); });
         fileImportar.addEventListener('change', (e) => {
@@ -570,6 +634,7 @@ document.addEventListener("DOMContentLoaded", () => {
         listaVertices = [];
 
         data.nodos.forEach(nodo => {
+            // Soporte para archivos viejos (numero) y nuevos (nombre)
             let nombreAsignado = nodo.nombre || `N${nodo.numero}`;
             crearVertice(nodo.x, nodo.y, nodo.id, nombreAsignado); 
         });
