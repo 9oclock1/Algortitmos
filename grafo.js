@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnDibujar = document.getElementById('btn-dibujar');
     const btnMover = document.getElementById('btn-mover');
     const btnEliminar = document.getElementById('btn-eliminar');
+    const btnVolver = document.getElementById('btn-volver');
 
     const RADIO_NODO = 22; 
     let listaVertices = []; 
@@ -19,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let nodoArrastrado = null;
     let offsetDrag = { x: 0, y: 0 };
     
-    // --- NUEVO: Variables para el modal ---
+    // Variables para el modal
     let aristaPendiente = null; 
     const modalPeso = document.getElementById('modal-peso');
     const inputPeso = document.getElementById('input-peso');
@@ -163,21 +164,18 @@ document.addEventListener("DOMContentLoaded", () => {
             resetearEstado(); return;
         }
 
-        // En lugar de usar prompt, preparamos y mostramos el modal
         aristaPendiente = { origen: verticeOrigen.id, destino: idDestino };
         
         inputPeso.value = "1";
         errorPeso.style.display = 'none';
         modalPeso.style.display = 'flex';
         
-        // Timeout ligero para asegurar que el modal renderice antes del focus
         setTimeout(() => inputPeso.focus(), 50);
 
         dibujandoArista = false;
         lineaTemporal.style.display = 'none';
     }
 
-    // Funciones del modal
     function procesarModalPeso() {
         if (!aristaPendiente) return;
         
@@ -208,7 +206,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnConfirmarPeso) btnConfirmarPeso.addEventListener('click', procesarModalPeso);
     if (btnCancelarPeso) btnCancelarPeso.addEventListener('click', cerrarModalPeso);
     
-    // Permitir enviar con la tecla Enter
     if (inputPeso) {
         inputPeso.addEventListener('keyup', (e) => {
             if (e.key === 'Enter') procesarModalPeso();
@@ -484,6 +481,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         data.aristas.forEach(arista => {
             crearAristaVisual(arista.origen, arista.destino, arista.peso);
+        });
+    }
+
+    // --- BOTÓN VOLVER ---
+    if (btnVolver) {
+        btnVolver.addEventListener('click', () => {
+            window.location.href = 'algoritmos.html';
         });
     }
 });

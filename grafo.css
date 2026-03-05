@@ -25,6 +25,28 @@ body {
     gap: 20px;
 }
 
+/* --- Botón Volver --- */
+.btn-volver {
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #8C8477;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    margin-bottom: -5px; 
+}
+
+.btn-volver:hover {
+    background: #EAE6DF; 
+    color: #4A443B; 
+}
+
 h3 { margin: 0; font-size: 11px; color: #8C8477; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;}
 h4 { margin: 0 0 12px 0; font-size: 14px; color: #4A443B; font-weight: 600; }
 
