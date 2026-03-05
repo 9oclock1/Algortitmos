@@ -9,12 +9,11 @@
 <body>
 
     <div class="panel-control">
-        <button id="btn-volver" class="btn-volver">← Volver a Algoritmos</button>
-
         <h3>Herramientas</h3>
         <div class="toolbar">
             <button id="btn-dibujar" class="btn-tool active">Dibujar</button>
             <button id="btn-mover" class="btn-tool">Mover</button>
+            <button id="btn-editar" class="btn-tool">Editar</button>
             <button id="btn-eliminar" class="btn-tool">Borrar</button>
         </div>
 
@@ -23,6 +22,7 @@
             <ul>
                 <li><strong>Dibujar:</strong> Clic en el fondo crea un nodo. Clic de un nodo a otro los conecta.</li>
                 <li><strong>Mover:</strong> Clic sostenido sobre un nodo para arrastrarlo.</li>
+                <li><strong>Editar:</strong> Clic sobre un nodo o flecha para cambiar su nombre/peso.</li>
                 <li><strong>Borrar:</strong> Clic sobre un nodo o flecha para eliminarlo.</li>
             </ul>
         </div>
@@ -53,6 +53,18 @@
         <line id="linea-temporal" x1="0" y1="0" x2="0" y2="0" stroke="#D6D0C4" stroke-width="2" stroke-dasharray="6,6" display="none" />
         <g id="capa-vertices"></g>
     </svg>
+
+    <div id="modal-nodo" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h4>Nombre del Nodo</h4>
+            <p id="modal-error-nodo" class="modal-error" style="display: none;">Mensaje de error</p>
+            <input type="text" id="input-nodo" maxlength="4" placeholder="Ej: A, V1, X">
+            <div class="modal-buttons">
+                <button id="btn-cancelar-nodo" class="btn-tool">Cancelar</button>
+                <button id="btn-confirmar-nodo" class="btn-tool active">Aceptar</button>
+            </div>
+        </div>
+    </div>
 
     <div id="modal-peso" class="modal-overlay" style="display: none;">
         <div class="modal-content">

@@ -6,10 +6,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const listaNodosUI = document.getElementById('lista-nodos');
     const contenedorMatriz = document.getElementById('contenedor-matriz');
 
+    // Botones
     const btnDibujar = document.getElementById('btn-dibujar');
     const btnMover = document.getElementById('btn-mover');
+    const btnEditar = document.getElementById('btn-editar'); // NUEVO BOTÓN
     const btnEliminar = document.getElementById('btn-eliminar');
-    const btnVolver = document.getElementById('btn-volver');
 
     const RADIO_NODO = 22; 
     let listaVertices = []; 
@@ -20,19 +21,32 @@ document.addEventListener("DOMContentLoaded", () => {
     let nodoArrastrado = null;
     let offsetDrag = { x: 0, y: 0 };
     
-    // Variables para el modal
+    // Variables para modales
+    let nodoPendiente = null;
+    let nodoEditando = null; 
+    const modalNodo = document.getElementById('modal-nodo');
+    const inputNodo = document.getElementById('input-nodo');
+    const btnConfirmarNodo = document.getElementById('btn-confirmar-nodo');
+    const btnCancelarNodo = document.getElementById('btn-cancelar-nodo');
+    const errorNodo = document.getElementById('modal-error-nodo');
+    const tituloModalNodo = document.querySelector('#modal-nodo h4');
+
     let aristaPendiente = null; 
+    let aristaEditando = null; 
     const modalPeso = document.getElementById('modal-peso');
     const inputPeso = document.getElementById('input-peso');
     const btnConfirmarPeso = document.getElementById('btn-confirmar-peso');
     const btnCancelarPeso = document.getElementById('btn-cancelar-peso');
     const errorPeso = document.getElementById('modal-error');
+    const tituloModalPeso = document.querySelector('#modal-peso h4');
 
+    // --- CAMBIO DE MODOS ---
     function cambiarModo(nuevoModo) {
         modoActual = nuevoModo;
         
         if (btnDibujar) btnDibujar.classList.remove('active');
         if (btnMover) btnMover.classList.remove('active');
+        if (btnEditar) btnEditar.classList.remove('active');
         if (btnEliminar) btnEliminar.classList.remove('active');
         
         if (modoActual === 'dibujar') {
@@ -41,6 +55,9 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (modoActual === 'mover') {
             if (btnMover) btnMover.classList.add('active');
             lienzo.style.cursor = "grab";
+        } else if (modoActual === 'editar') {
+            if (btnEditar) btnEditar.classList.add('active');
+            lienzo.style.cursor = "pointer"; // Indica que algo se puede tocar
         } else if (modoActual === 'eliminar') {
             if (btnEliminar) btnEliminar.classList.add('active');
             lienzo.style.cursor = "not-allowed";
@@ -49,17 +66,72 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (btnDibujar) btnDibujar.addEventListener('click', () => cambiarModo('dibujar'));
     if (btnMover) btnMover.addEventListener('click', () => cambiarModo('mover'));
+    if (btnEditar) btnEditar.addEventListener('click', () => cambiarModo('editar'));
     if (btnEliminar) btnEliminar.addEventListener('click', () => cambiarModo('eliminar'));
 
-    // --- CREAR NODOS ---
+    // --- LÓGICA DE DIBUJO ---
     lienzo.addEventListener('click', (e) => {
         if (modoActual !== 'dibujar' || dibujandoArista) return;
-        if (e.target.id === 'lienzo') crearVertice(e.clientX, e.clientY);
+        if (e.target.id === 'lienzo') {
+            nodoPendiente = { x: e.clientX, y: e.clientY };
+            const nextLetter = String.fromCharCode(65 + (listaVertices.length % 26));
+            inputNodo.value = nextLetter;
+            tituloModalNodo.textContent = "Nombre del Nodo";
+            errorNodo.style.display = 'none';
+            modalNodo.style.display = 'flex';
+            setTimeout(() => inputNodo.focus(), 50);
+        }
     });
 
-    function crearVertice(x, y, idForzado = null) {
+    // Abrir Modal Edición Nodo
+    function abrirEdicionNodo(idNodo) {
+        nodoEditando = idNodo;
+        tituloModalNodo.textContent = "Editar Nombre";
+        const nodoObj = listaVertices.find(v => v.id === idNodo);
+        inputNodo.value = nodoObj.nombre;
+        errorNodo.style.display = 'none';
+        modalNodo.style.display = 'flex';
+        setTimeout(() => {
+            inputNodo.focus();
+            inputNodo.select();
+        }, 50);
+    }
+
+    function procesarModalNodo() {
+        let nombreVal = inputNodo.value.trim().substring(0, 4); 
+        if (nombreVal === "") {
+            errorNodo.textContent = "El nombre no puede estar vacío.";
+            errorNodo.style.display = 'block'; return;
+        }
+
+        if (nodoEditando) {
+            const nodoObj = listaVertices.find(v => v.id === nodoEditando);
+            if (nodoObj) {
+                nodoObj.nombre = nombreVal;
+                const nodoDOM = document.getElementById(nodoEditando);
+                if (nodoDOM) nodoDOM.querySelector('text').textContent = nombreVal;
+            }
+            actualizarVistas();
+            cerrarModalNodo();
+        } else if (nodoPendiente) {
+            crearVertice(nodoPendiente.x, nodoPendiente.y, null, nombreVal);
+            cerrarModalNodo();
+        }
+    }
+
+    function cerrarModalNodo() {
+        modalNodo.style.display = 'none';
+        nodoPendiente = null;
+        nodoEditando = null;
+    }
+
+    if (btnConfirmarNodo) btnConfirmarNodo.addEventListener('click', procesarModalNodo);
+    if (btnCancelarNodo) btnCancelarNodo.addEventListener('click', cerrarModalNodo);
+    if (inputNodo) inputNodo.addEventListener('keyup', (e) => { if (e.key === 'Enter') procesarModalNodo(); });
+
+    function crearVertice(x, y, idForzado = null, nombreForzado = null) {
         const idUnico = idForzado || `v-${Date.now()}`;
-        if (!idForzado) listaVertices.push({ id: idUnico, numero: 0 });
+        if (!idForzado) listaVertices.push({ id: idUnico, nombre: nombreForzado });
         
         const grupo = document.createElementNS("http://www.w3.org/2000/svg", "g");
         grupo.setAttribute('class', 'vertice');
@@ -72,6 +144,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (modoActual === 'eliminar') {
                 e.stopPropagation();
                 eliminarVertice(idUnico);
+            } else if (modoActual === 'editar') {
+                e.stopPropagation();
+                abrirEdicionNodo(idUnico);
             }
         });
 
@@ -90,25 +165,35 @@ document.addEventListener("DOMContentLoaded", () => {
         const texto = document.createElementNS("http://www.w3.org/2000/svg", "text");
         texto.setAttribute('dy', 5);
         texto.setAttribute('text-anchor', 'middle');
+        texto.textContent = nombreForzado; 
+
+        // Doble clic también funciona como atajo para editar
+        texto.addEventListener('dblclick', (e) => {
+            e.stopPropagation(); 
+            if (modoActual !== 'eliminar') abrirEdicionNodo(idUnico);
+        });
 
         grupo.appendChild(circulo);
         grupo.appendChild(texto);
         capaVertices.appendChild(grupo);
 
-        if (!idForzado) reenumerarNodos(); 
+        if (!idForzado) actualizarVistas(); 
     }
 
-    function reenumerarNodos() {
-        listaVertices.forEach((nodo, index) => {
-            nodo.numero = index + 1;
-            const grupo = document.getElementById(nodo.id);
-            if(grupo) {
-                const textoElement = grupo.querySelector('text');
-                if(textoElement) textoElement.textContent = nodo.numero;
-            }
-        });
+    function actualizarVistas() {
         actualizarListaUI();
         actualizarMatriz();
+    }
+
+    function actualizarListaUI() {
+        if(!listaNodosUI) return;
+        listaNodosUI.innerHTML = '';
+        if (listaVertices.length === 0) listaNodosUI.innerHTML = '<li class="empty-msg">No hay nodos</li>';
+        else listaVertices.forEach(nodo => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span>Nodo <strong>${nodo.nombre}</strong></span>`;
+            listaNodosUI.appendChild(li);
+        });
     }
 
     function iniciarArrastre(e, grupo) {
@@ -141,7 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // --- ARISTAS Y MODAL ---
+    // --- ARISTAS ---
     function iniciarArista(e, id) {
         e.stopPropagation();
         const nodo = document.getElementById(id);
@@ -165,52 +250,67 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         aristaPendiente = { origen: verticeOrigen.id, destino: idDestino };
-        
         inputPeso.value = "1";
+        tituloModalPeso.textContent = "Peso de la conexión";
         errorPeso.style.display = 'none';
         modalPeso.style.display = 'flex';
-        
         setTimeout(() => inputPeso.focus(), 50);
 
         dibujandoArista = false;
         lineaTemporal.style.display = 'none';
     }
 
+    // Abrir Modal Edición Arista
+    function abrirEdicionArista(idArista, pesoActual) {
+        aristaEditando = idArista;
+        tituloModalPeso.textContent = "Editar Peso";
+        inputPeso.value = pesoActual;
+        errorPeso.style.display = 'none';
+        modalPeso.style.display = 'flex';
+        setTimeout(() => {
+            inputPeso.focus();
+            inputPeso.select();
+        }, 50);
+    }
+
     function procesarModalPeso() {
-        if (!aristaPendiente) return;
-        
         let p = inputPeso.value.trim();
         if (p === "") {
             errorPeso.textContent = "El peso no puede estar vacío.";
-            errorPeso.style.display = 'block';
-            return;
+            errorPeso.style.display = 'block'; return;
         }
         
         let pesoFinal = parseFloat(p);
         if (isNaN(pesoFinal) || pesoFinal <= 0) {
             errorPeso.textContent = "Ingresa un número mayor a cero.";
-            errorPeso.style.display = 'block';
-            return;
+            errorPeso.style.display = 'block'; return;
         }
 
-        crearAristaVisual(aristaPendiente.origen, aristaPendiente.destino, pesoFinal);
-        cerrarModalPeso();
+        if (aristaEditando) {
+            const aristaDOM = document.getElementById(aristaEditando);
+            if (aristaDOM) {
+                aristaDOM.dataset.peso = pesoFinal;
+                const textoSVG = document.getElementById(`text-${aristaEditando}`);
+                if (textoSVG) textoSVG.textContent = pesoFinal;
+            }
+            actualizarVistas();
+            cerrarModalPeso();
+        } else if (aristaPendiente) {
+            crearAristaVisual(aristaPendiente.origen, aristaPendiente.destino, pesoFinal);
+            cerrarModalPeso();
+        }
     }
 
     function cerrarModalPeso() {
         modalPeso.style.display = 'none';
         aristaPendiente = null;
+        aristaEditando = null;
         verticeOrigen = null;
     }
 
     if (btnConfirmarPeso) btnConfirmarPeso.addEventListener('click', procesarModalPeso);
     if (btnCancelarPeso) btnCancelarPeso.addEventListener('click', cerrarModalPeso);
-    
-    if (inputPeso) {
-        inputPeso.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') procesarModalPeso();
-        });
-    }
+    if (inputPeso) inputPeso.addEventListener('keyup', (e) => { if (e.key === 'Enter') procesarModalPeso(); });
 
     function calcularRutaArista(idOrigen, idDestino) {
         const nodoOrig = document.getElementById(idOrigen);
@@ -232,10 +332,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const cp2X = x1 - r * 3.5;
             const cp2Y = y1 - r * 6;
 
-            return {
-                d: `M ${sx} ${sy} C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${ex} ${ey}`,
-                tx: x1, ty: y1 - r * 4
-            };
+            return { d: `M ${sx} ${sy} C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${ex} ${ey}`, tx: x1, ty: y1 - r * 4 };
         } else {
             const dx = x2 - x1;
             const dy = y2 - y1;
@@ -259,10 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const tx = 0.25 * sx + 0.5 * cx + 0.25 * ex + (-dy/dist) * offsetTexto;
             const ty = 0.25 * sy + 0.5 * cy + 0.25 * ey + (dx/dist) * offsetTexto;
 
-            return {
-                d: `M ${sx} ${sy} Q ${cx} ${cy} ${ex} ${ey}`,
-                tx: tx, ty: ty + 5
-            };
+            return { d: `M ${sx} ${sy} Q ${cx} ${cy} ${ex} ${ey}`, tx: tx, ty: ty + 5 };
         }
     }
 
@@ -277,7 +371,11 @@ document.addEventListener("DOMContentLoaded", () => {
         arista.setAttribute('id', idArista);
         arista.setAttribute('d', ruta.d);
         arista.setAttribute('data-origen', idOrigen);
-        arista.setAttribute('data-destino', idDestino);
+        
+        // --- ¡EL BUG REPARADO ESTÁ AQUÍ! ---
+        arista.setAttribute('data-destino', idDestino); 
+        // -----------------------------------
+
         arista.setAttribute('data-peso', peso);
 
         const textoPeso = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -287,18 +385,31 @@ document.addEventListener("DOMContentLoaded", () => {
         textoPeso.setAttribute('x', ruta.tx);
         textoPeso.setAttribute('y', ruta.ty);
 
-        arista.addEventListener('click', (e) => {
+        // Click en la línea o el texto
+        const clickHandler = (e) => {
             if (modoActual === 'eliminar') {
                 e.stopPropagation();
                 textoPeso.remove(); 
-                e.target.remove();  
-                actualizarMatriz(); 
+                arista.remove();  
+                actualizarVistas(); 
+            } else if (modoActual === 'editar') {
+                e.stopPropagation();
+                abrirEdicionArista(idArista, arista.dataset.peso);
             }
+        };
+
+        arista.addEventListener('click', clickHandler);
+        textoPeso.addEventListener('click', clickHandler);
+
+        // Atajo de doble clic
+        textoPeso.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+            if (modoActual !== 'eliminar') abrirEdicionArista(idArista, arista.dataset.peso);
         });
 
         capaAristas.appendChild(arista);
         capaAristas.appendChild(textoPeso);
-        actualizarMatriz(); 
+        actualizarVistas(); 
     }
 
     function actualizarAristasConectadas(idNodo) {
@@ -340,20 +451,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         document.getElementById(idVertice)?.remove();
         listaVertices = listaVertices.filter(v => v.id !== idVertice);
-        reenumerarNodos();
+        actualizarVistas();
     }
 
-    function actualizarListaUI() {
-        if(!listaNodosUI) return;
-        listaNodosUI.innerHTML = '';
-        if (listaVertices.length === 0) listaNodosUI.innerHTML = '<li class="empty-msg">No hay nodos</li>';
-        else listaVertices.forEach(nodo => {
-            const li = document.createElement('li');
-            li.innerHTML = `<span>Nodo <strong>${nodo.numero}</strong></span>`;
-            listaNodosUI.appendChild(li);
-        });
-    }
-
+    // --- MATRIZ CON NOMBRES ---
     function actualizarMatriz() {
         if (!contenedorMatriz) return;
         const n = listaVertices.length;
@@ -381,11 +482,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         let html = '<table class="matriz-tabla"><thead><tr><th></th>';
-        for(let i=0; i<n; i++) html += `<th>V${listaVertices[i].numero}</th>`;
+        for(let i=0; i<n; i++) html += `<th>${listaVertices[i].nombre}</th>`;
         html += '<th class="col-suma">Sum_F</th><th class="col-cont">Cont_F</th></tr></thead><tbody>';
 
         for(let i=0; i<n; i++) {
-            html += `<tr><th>V${listaVertices[i].numero}</th>`;
+            html += `<tr><th>${listaVertices[i].nombre}</th>`;
             for(let j=0; j<n; j++) html += `<td>${matriz[i][j]}</td>`;
             html += `<td class="col-suma">${sumFila[i]}</td><td class="col-cont">${contFila[i]}</td></tr>`;
         }
@@ -403,7 +504,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- IMPORTAR / EXPORTAR JSON ---
-
     const btnExportar = document.getElementById('btn-exportar');
     const btnImportar = document.getElementById('btn-importar');
     const fileImportar = document.getElementById('file-importar');
@@ -425,7 +525,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const nodoSVG = document.getElementById(v.id);
                 return {
                     id: v.id,
-                    numero: v.numero,
+                    nombre: v.nombre, 
                     x: parseFloat(nodoSVG.dataset.cx),
                     y: parseFloat(nodoSVG.dataset.cy)
                 };
@@ -444,10 +544,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (btnImportar && fileImportar) {
-        btnImportar.addEventListener('click', () => {
-            fileImportar.click();
-        });
-
+        btnImportar.addEventListener('click', () => { fileImportar.click(); });
         fileImportar.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -473,21 +570,14 @@ document.addEventListener("DOMContentLoaded", () => {
         listaVertices = [];
 
         data.nodos.forEach(nodo => {
-            listaVertices.push({ id: nodo.id, numero: nodo.numero });
-            crearVertice(nodo.x, nodo.y, nodo.id); 
+            let nombreAsignado = nodo.nombre || `N${nodo.numero}`;
+            crearVertice(nodo.x, nodo.y, nodo.id, nombreAsignado); 
         });
-
-        reenumerarNodos();
 
         data.aristas.forEach(arista => {
             crearAristaVisual(arista.origen, arista.destino, arista.peso);
         });
-    }
-
-    // --- BOTÓN VOLVER ---
-    if (btnVolver) {
-        btnVolver.addEventListener('click', () => {
-            window.location.href = 'algoritmos.html';
-        });
+        
+        actualizarVistas();
     }
 });

@@ -25,28 +25,6 @@ body {
     gap: 20px;
 }
 
-/* --- Botón Volver --- */
-.btn-volver {
-    padding: 8px 12px;
-    border: none;
-    background: transparent;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    color: #8C8477;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    width: fit-content;
-    margin-bottom: -5px; 
-}
-
-.btn-volver:hover {
-    background: #EAE6DF; 
-    color: #4A443B; 
-}
-
 h3 { margin: 0; font-size: 11px; color: #8C8477; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;}
 h4 { margin: 0 0 12px 0; font-size: 14px; color: #4A443B; font-weight: 600; }
 
@@ -55,20 +33,25 @@ h4 { margin: 0 0 12px 0; font-size: 14px; color: #4A443B; font-weight: 600; }
     padding: 15px;
     border-radius: 8px;
     border-left: 3px solid #C4BCAF; /* Arena oscuro */
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.5;
 }
 .guia-rapida ul { padding-left: 20px; margin: 0;}
 .guia-rapida li { margin-bottom: 6px; color: #5D564D; }
 
+/* Flex para que quepan los 4 botones */
+.toolbar { display: flex; gap: 5px; flex-wrap: wrap; }
+.json-tools { display: flex; gap: 8px; }
+
 .btn-tool, .btn-json {
     flex: 1;
-    padding: 10px;
+    min-width: 65px; /* Para que no se encojan de más */
+    padding: 8px 5px;
     border: 1px solid #D6D0C4;
     background: #FCFBF7;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: #5D564D;
     transition: all 0.2s ease;
@@ -91,13 +74,13 @@ ul#lista-nodos { list-style: none; padding: 0; margin: 0; font-size: 13px; max-h
 
 .vertice circle {
     fill: #FCFBF7;
-    stroke: #C4BCAF; /* Borde arena */
+    stroke: #C4BCAF; 
     stroke-width: 2px;
     transition: all 0.3s ease;
     cursor: pointer;
 }
 .vertice:hover circle{ 
-    stroke: #8A7B66; /* Arcilla */
+    stroke: #8A7B66; 
     stroke-width: 3px;
     filter: drop-shadow(0 4px 8px rgba(138, 123, 102, 0.15));
 }
@@ -105,12 +88,17 @@ ul#lista-nodos { list-style: none; padding: 0; margin: 0; font-size: 13px; max-h
     fill: #4A443B;
     font-size: 14px;
     font-weight: 600;
-    pointer-events: none;
+    pointer-events: auto; 
+    cursor: pointer;      
     user-select: none;
+    transition: fill 0.2s ease;
+}
+.vertice text:hover {
+    fill: #8A7B66; 
 }
 
 .arista {
-    stroke: #C4BCAF; /* Arena */
+    stroke: #C4BCAF; 
     stroke-width: 2px;
     marker-end: url(#arrowhead);
     cursor: pointer;
@@ -123,14 +111,19 @@ ul#lista-nodos { list-style: none; padding: 0; margin: 0; font-size: 13px; max-h
     font-size: 14px;
     font-weight: 600;
     fill: #736758; 
-    pointer-events: none;
+    pointer-events: auto; 
+    cursor: pointer;      
     user-select: none;
     text-anchor: middle;
     paint-order: stroke;
-    stroke: #F4F1EA; /* Halo del mismo color del fondo */
+    stroke: #F4F1EA; 
     stroke-width: 5px;
     stroke-linecap: round;
     stroke-linejoin: round;
+    transition: fill 0.2s ease;
+}
+.peso-texto:hover {
+    fill: #8A7B66; 
 }
 
 /* --- Matriz --- */
@@ -151,14 +144,11 @@ ul#lista-nodos { list-style: none; padding: 0; margin: 0; font-size: 13px; max-h
 .matriz-tabla .col-suma, .matriz-tabla .fila-suma { background-color: #EBE5D9; font-weight: 600; }
 .matriz-tabla .col-cont, .matriz-tabla .fila-cont { background-color: #FCFBF7; font-weight: 600; color: #736758;}
 
-/* --- Modal Personalizado --- */
+/* --- Modales Personalizados --- */
 .modal-overlay {
     position: fixed;
-    top: 0; 
-    left: 0; 
-    width: 100vw; 
-    height: 100vh;
-    background: rgba(74, 68, 59, 0.5); /* Oscurece el fondo con un tono tierra */
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(74, 68, 59, 0.5); 
     backdrop-filter: blur(2px);
     display: flex;
     justify-content: center;
@@ -167,7 +157,7 @@ ul#lista-nodos { list-style: none; padding: 0; margin: 0; font-size: 13px; max-h
 }
 
 .modal-content {
-    background: #FCFBF7; /* Blanco hueso */
+    background: #FCFBF7; 
     padding: 30px;
     border-radius: 16px;
     box-shadow: 0 10px 40px rgba(74, 68, 59, 0.2);
@@ -177,11 +167,7 @@ ul#lista-nodos { list-style: none; padding: 0; margin: 0; font-size: 13px; max-h
     animation: aparecer 0.3s ease-out;
 }
 
-.modal-content h4 {
-    margin: 0 0 15px 0;
-    font-size: 16px;
-    color: #4A443B;
-}
+.modal-content h4 { margin: 0 0 15px 0; font-size: 16px; color: #4A443B; }
 
 .modal-content input {
     width: 80%;
@@ -199,21 +185,9 @@ ul#lista-nodos { list-style: none; padding: 0; margin: 0; font-size: 13px; max-h
     transition: border-color 0.2s;
 }
 
-.modal-content input:focus {
-    border-color: #8A7B66; /* Arcilla al enfocar */
-}
-
-.modal-error {
-    color: #e74c3c;
-    font-size: 12px;
-    font-weight: 600;
-    margin: -10px 0 10px 0;
-}
-
-.modal-buttons {
-    display: flex;
-    gap: 10px;
-}
+.modal-content input:focus { border-color: #8A7B66; }
+.modal-error { color: #e74c3c; font-size: 12px; font-weight: 600; margin: -10px 0 10px 0; }
+.modal-buttons { display: flex; gap: 10px; }
 
 @keyframes aparecer {
     from { opacity: 0; transform: scale(0.9); }
