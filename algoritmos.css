@@ -110,3 +110,65 @@ main {
 .card.visible .etiqueta-ayuda {
     opacity: 1;
 }
+
+/* --- SECCIÓN DESTACADA (HERO) --- */
+.hero-section {
+    text-align: center;
+    border: 2px solid #8A7B66;
+    background: linear-gradient(135deg, #FCFBF7 0%, #F0EBE1 100%);
+}
+
+.hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.contenedor-boton-destacado {
+    position: relative;
+    margin-top: 15px;
+    display: inline-block;
+}
+
+/* --- BOTÓN PRINCIPAL --- */
+.btn-destacado {
+    background-color: #8A7B66;
+    color: #FFF;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(138, 123, 102, 0.4);
+    transition: all 0.3s ease;
+}
+
+.btn-destacado:hover {
+    background-color: #716453; /* Tono más oscuro al pasar el mouse */
+    transform: translateY(-4px); /* Se levanta un poco */
+    box-shadow: 0 8px 25px rgba(138, 123, 102, 0.6);
+}
+
+/* --- ETIQUETA ANIMADA --- */
+.etiqueta-ayuda-hero {
+    position: absolute;
+    top: -15px;
+    right: -25px;
+    background-color: #5D564D;
+    color: #FFF;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    font-weight: bold;
+    pointer-events: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    /* Animación de latido para llamar la atención */
+    animation: latido 1.5s infinite;
+}
+
+@keyframes latido {
+    0% { transform: scale(1) rotate(5deg); }
+    50% { transform: scale(1.1) rotate(5deg); }
+    100% { transform: scale(1) rotate(5deg); }
+}
